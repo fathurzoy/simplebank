@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"tutorial.sqlc.dev/app/util"
+	"github.com/fathurzoy/util"
 )
 
 func createRandomEntry(t *testing.T, account Account) Entry {
