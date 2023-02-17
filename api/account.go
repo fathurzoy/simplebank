@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
-	db "github.com/fathurzoy/db/sqlc"
+	db "github.com/fathurzoy/simplebank/db/sqlc"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +13,7 @@ type createAccountRequest struct {
 	Currency string `json:"currency" binding:"required,oneof=USD EUR"`
 }
 
-func (server *Server) createAccount(ctx *gin.Context){
+func (server *Server) createAccount(ctx *gin.Context) {
 	var req createAccountRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -21,9 +21,9 @@ func (server *Server) createAccount(ctx *gin.Context){
 	}
 
 	arg := db.CreateAccountParams{
-		Owner: req.Owner,
+		Owner:    req.Owner,
 		Currency: req.Currency,
-		Balance: 0,
+		Balance:  0,
 	}
 
 	account, err := server.store.CreateAccount(ctx, arg)
@@ -60,9 +60,8 @@ func (server *Server) getAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, account)
 }
 
-
 type listAccountRequest struct {
-	PageID int32 `form:"page_id" binding:"required,min=1"`
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
@@ -74,15 +73,15 @@ func (server *Server) listAccount(ctx *gin.Context) {
 	}
 
 	arg := db.ListAccountsParams{
-		Limit: req.PageSize,
+		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
-	accounts, err := server.store.ListAccounts(ctx, arg)
+	account, err := server.store.ListAccounts(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, accounts)
+	ctx.JSON(http.StatusOK, account)
 }
